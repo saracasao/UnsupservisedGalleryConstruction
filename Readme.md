@@ -6,8 +6,8 @@
 python3.8 -m venv gallery
 cd gallery 
 source bin/activate
-git clone <repository git path>
-cd <folder repo> 
+git clone https://github.com/saracasao/UnsupservisedGalleryConstruction.git
+cd UnsupservisedGalleryConstruction 
 pip install -r requirements.txt
 ```
 
