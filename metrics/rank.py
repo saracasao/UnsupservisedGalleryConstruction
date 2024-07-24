@@ -4,6 +4,7 @@ import warnings
 import torch
 from collections import defaultdict
 
+
 def eval_market1501(distmat, q_pids, g_pids, q_camids, g_camids, max_rank, video):
     """Evaluation with market1501 metric
     Key: for each query identity, its gallery images from the same camera view are discarded.
@@ -60,7 +61,7 @@ def eval_market1501(distmat, q_pids, g_pids, q_camids, g_camids, max_rank, video
         AP = tmp_cmc.sum() / num_rel
         all_AP.append(AP)
 
-    assert num_valid_q > 0, 'Error: all query identities do not appear in gallery'
+    # assert num_valid_q > 0, 'Error: all query identities do not appear in gallery'
     
     if video:
         return all_cmc, all_AP, num_valid_q

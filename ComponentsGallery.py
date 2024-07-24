@@ -1,11 +1,12 @@
 import numpy as np
 import cv2
-
-from Utils import get_Centroid, get_wCentroid, get_DiversityModel
+from Utils import get_wCentroid, get_DiversityModel
 from scipy.spatial import distance
 
-class Gallery():
-    next_id = 0 
+
+class Gallery:
+    next_id = 0
+
     def __init__(self, camera = None):
         self.models = []
         self.candidatesTOmodel = []
@@ -18,7 +19,7 @@ class Gallery():
         self.clustering = False
         self.flag_sample = None
     
-    def unsupervisedInitialization(self, models, config):
+    def unsupervisedInitialization(self, models):
         num_models = len(models)
         for model in models:
             assert model.identity is not None
@@ -75,7 +76,6 @@ class Gallery():
                 new_dist_model.shape = (new_dist_model.shape[0], 1)
                 model.cluster_distances = np.append(model.cluster_distances,new_dist_model , axis = 1)
                 assert model.cluster_distances.shape[1] == len(self.models)  + 1
-            
         self.models.append(new_model)
 
     def add_new_labeled_model(self, model):
@@ -101,9 +101,8 @@ class Gallery():
         return clustering
     
 
-class AppearanceModel():
+class AppearanceModel:
     def __init__(self, gt):
-        # self.id = None 
         self.label = gt
         self.identity = None
         self.samples = []
@@ -111,12 +110,12 @@ class AppearanceModel():
         self.centroid = None
         self.class_mean = None
         self.diversity = None
-        #Update data
+        # Update data
         self.diameter = None
         self.cluster_distances = None
         self.ref_updateModels = []
         self.P = None
-        #Evaluation data
+        # Evaluation data
         self.n_newModel = 0
         self.last_modelUpate = None
 
@@ -124,17 +123,12 @@ class AppearanceModel():
         gt = [int(s.gt) for s in self.samples]
         return gt
 
-class Sample():
-    dir_images = '/home/scasao/Documents/0_DATASET/REID/People/Mars/bbox_test/'
-    dir_skeleton = '/home/scasao/Documents/0_DATASET/REID/People/Mars/bbox_test_skeleton/'
-    
-    # dir_images = '/home/scasao/Documents/0_DATASET/REID/People/DukeMTMC-VideoReID/gallery/'
-    # dir_skeleton = '/home/scasao/Documents/0_DATASET/REID/People/DukeMTMC-VideoReID-Feat/gallery_sklt/'
-    
-    # dir_images = '/home/scasao/Documents/0_DATASET/REID/People/iLIDS-VID/i-LIDS-VID/sequences/'
-    # dir_skeleton = '/home/scasao/Documents/0_DATASET/REID/People/iLIDS-VID/i-LIDS-VID/sequences_sklt/'
-    
-    def __init__(self, feat, path, camera, gt):
+
+class Sample:
+    def __init__(self, feat, path, camera, gt, config):
+        self.dir_skeleton = config.dir_skeletons
+        self.dir_images = config.dir_images
+
         self.feat = feat
         self.path = path
         self.camera = camera
@@ -146,7 +140,8 @@ class Sample():
         self.distmat = []
         self.key_points, self.perct_key_points = self.get_key_points()
         self.ratio = self.get_ratio()
-    
+
+
     def get_key_points(self):
         N = 18 
         folder, name_sklt = self.get_name()
@@ -202,20 +197,14 @@ class Sample():
             nameFile = self.path.split('/')[-1]
             nameFile, _ = nameFile.split('.')
             folder = nameFile[0:4]
-        elif 'i-LIDS-VID' in self.dir_images:
-            nameFile = self.path.split('/')[-1]
-            nameFile, _ = nameFile.split('.')
-            folder1 = nameFile[0:4]
-            folder2 = nameFile[5:14]
-            folder = folder1 + '/' + folder2
         elif 'Duke' in self.dir_images:
             nameFile = self.path.split('/')[-1]
             nameFile, _ = nameFile.split('.')
             
             folder1, folder2 = self.path.split('/')[-3:-1]
             folder = folder1 + '/' + folder2
-        else: 
-            print('DATASET NOT DEFINED')
+        else:
+            raise RuntimeError("Dataset not defined")
         return folder, nameFile
     
 
